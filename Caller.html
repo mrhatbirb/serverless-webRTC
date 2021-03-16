@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="description" content="A webpage that allows to initiate webRTC 
+connection and make video/audio calls">
+<meta name="author" content="aditya18007@iiitd.ac.in">
+
+<title>Caller</title>
+
+<style type="text/css">
+
+
+body{
+	/*Ubuntu colors*/
+	background:linear-gradient(to right, #E95420, #EB6536, #772953);
+	font-family: Verdana;
+	line-height: 1.6em;
+}
+
+h1{
+	text-align: center;
+	color: #F92672
+}
+
+p{
+	margin: 5px 10px;
+	text-align: center;
+}
+
+ol{
+	color: #E69F66;
+}
+
+.box-1{
+	background: #272822;
+	color:#ffffff;
+	width:90%;
+	margin:auto;
+	margin-bottom: 1em;
+	border-style: solid;
+	padding: 15px;
+	box-shadow: 10px 10px 8px #333333;
+}
+
+.form-1{
+	padding: 20px;
+}
+
+.form-1 .form-group{
+	margin-top: 1em;
+	padding-bottom: 15px; 
+}
+
+.form-1 label{
+	display: block;
+	color:  #66D9EF;
+	border-style: normal;
+	width: 100%;
+	padding: 10px;
+	margin: 3px;
+	width:100%;
+}
+
+.form-1 input[type="textarea"]{
+	padding: 10px;
+	margin: 3px;
+	width:100%;
+	background:#272822;
+	color: #A6E22E;
+	font-size: 22px;
+	border-style: solid;
+	border-color: #75715E;
+}
+
+.form-1 input[type="button"]{
+	padding: 10px;
+	margin: 3px;
+	background: #77216F;
+	color: #ffffff;
+	font-size: 22px;
+	border-style: solid;
+	border-color: #75715E;
+	box-shadow: 1px 1px 0.8px #AD79A8;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+
+<div id="descriptionArea" class="box-1" style="margin-top: 2em;">
+	<!-- Description of what this page is and how to use it.-->
+	<h1 id="mainHeading">WebRTC Caller</h1>
+	<p>This page allows you to initiate a video or audio call using your web 
+	browser. Following are the steps involved : </p>
+	<ol>
+		<li>Generate your SDP <strong>offer</strong>. It will carry information 
+			like codecs, IPs that help other browsers connect to you.</li>
+
+		<li>Your peer will generate an <strong>answer</strong> in response to 
+			your <em>offer</em>.</li>
+
+		<li>Paste your peer's <em>answer</em> and start the call.</li>
+	</ol>
+</div>
+
+</header>
+
+<div id="submissionArea" class="box-1">
+	<!-- Generate SDPs and Paste callee's details.-->
+	<form id="form_1" class="form-1">
+		<input type = "button" value="Generate SDP offer">
+		<div class="form-group">
+		<label for="mySDP_area">Your offer</label>
+  		<input type="textarea" id="mySDP_area" name="mySDP_area" placeholder="Click generate SDP offer
+ to create one.">
+  		</div>
+  		<div class="form-group">
+  		<label for="peerSDP_area">Peer answer</label>
+  		<input type="textarea" id="peerSDP_area" name="peerSDP_area" placeholder="Enter Peer SDP">
+  		</div>
+  		<input type="button" value="Submit Peer SDP">
+	</form>
+</div>
+
+<div id="callArea" class="box-1">
+	<!-- The actual call video/audio takes place here-->
+	<video id="localVideo"></video>
+	<video id="remoteVideo"></video>
+</div>
+
+</body>
+
+</html>
