@@ -20,5 +20,4 @@ able to communicate with each other using just these two html files.
 * Basic coneection establishment is taken from here.
 
 ### webrtc.org
-* Great introduction with code examples.
-* https://webrtc.org/support/overview
+* https://webrtc.org/getting-started/overview
