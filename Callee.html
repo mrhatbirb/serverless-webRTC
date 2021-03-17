@@ -44,6 +44,17 @@ ol{
 	padding: 15px;
 }
 
+.box-2{
+	background: #272822;
+	color:#ffffff;
+	width:50%;
+	margin:auto;
+	margin-bottom: 1em;
+	border-style: solid;
+	padding: 15px;
+	box-shadow: 10px 10px 8px #333333;
+}
+
 .form-1{
 	padding: 20px;
 }
@@ -85,6 +96,21 @@ ol{
 	box-shadow: 1px 1px 0.8px #AD79A8;
 }
 
+.remoteVideoPlayer{
+	width:90%;
+	margin:auto;
+	margin-bottom: 1em;
+	padding: 15px;
+	text-align: center;
+}
+
+.localVideoPlayer{
+	width:30%;
+	margin:auto;
+	margin-bottom: 1em;
+	padding: 15px;
+}
+
 </style>
 
 </head>
@@ -117,7 +143,7 @@ ol{
 		<label for="peerSDP_area">Peer offer</label>
   		<input type="textarea" id="peerSDP_area" name="peerSDP_area" placeholder="Enter peer SDP offer.">
   		</div>
-		<input type = "button" value="Set peer Offer">
+		<input type = "button" onclick="setPeerOffer()" value="Set peer Offer">
   		<div class="form-group">
   		<label for="mySDP_area">Your answer</label>
   		<input type="textarea" id="mySDP_area" name="mySDP_area" placeholder="Your SDP answer will be generated here">
@@ -125,12 +151,72 @@ ol{
 	</form>
 </div>
 
-<div id="callArea" class="box-1">
+<div id="callArea" class="box-2">
 	<!-- The actual call video/audio takes place here-->
-	<video id="localVideo"></video>
-	<video id="remoteVideo"></video>
+	<div class='remoteVideoPlayer' ><video style="width:100%;" style="height:auto;" id="remoteVideo"></video></div>
+	<div class="localVideoPlayer" ><video style="width:100%;" style="height:auto;" autoplay playsinline controls="false" id="localVideo"></video></div>
 </div>
 
+<!-- ---------------------------------------Java Script------------------------------------------>
+<script>
+
+//Global Constants
+const mediaConstraints = {'video': true, 'audio': false};
+const peerConnection = new RTCPeerConnection();    
+
+peerConnection.addEventListener('connectionstatechange', event => {
+    if (peerConnection.connectionState === 'connected') {
+        alert("Connection established");
+    }
+});
+
+peerConnection.onicecandidate = e =>{
+	document.getElementById("mySDP_area").value = JSON.stringify(peerConnection.localDescription);
+}
+
+peerConnection.ondatachannel= e => {
+
+      const receiveChannel = e.channel;
+      receiveChannel.onmessage =e =>  console.log("messsage received!!!"  + e.data )
+      receiveChannel.onopen = e => alert("Data channel opened");
+      receiveChannel.onclose =e => alert("Data channel closed");
+      peerConnection.channel = receiveChannel;
+
+}
+
+async function getLocalVideo() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        const videoElement = document.querySelector('video#localVideo');
+        videoElement.srcObject = stream;
+    } catch(error) {
+        alert(error.message);
+    }
+}
+
+async function setPeerOffer(){
+	//Also generates answer
+	try{
+		const offer = JSON.parse(document.getElementById("peerSDP_area").value);
+		await peerConnection.setRemoteDescription(offer);
+		const answer = await peerConnection.createAnswer();
+		await peerConnection.setLocalDescription(answer);	
+		//This is not the full answer, you can't send this and expect conenction.
+		//peerConnection.localDescription is a bigger value and we get the value from 
+		//peerConnection.onicecandidate
+	} catch(error){
+		alert(error.message);
+	}
+}
+
+
+function main() {
+	getLocalVideo();
+}
+
+main();
+
+</script>
 </body>
 
 </html>
