@@ -155,7 +155,7 @@ ol{
 
 <div id="callArea" class="box-2">
 	<!-- The actual call video/audio takes place here-->
-	<div class='remoteVideoPlayer' ><video style="width:100%;" style="height:auto;" id="remoteVideo"></video></div>
+	<div class='remoteVideoPlayer' ><video style="width:100%;" style="height:auto;" autoplay id="remoteVideo"></video></div>
 	<div class="localVideoPlayer" ><video style="width:100%;" style="height:auto;" autoplay playsinline controls="false" id="localVideo"></video></div>
 </div>
 <!-- ---------------------------------------Java Script------------------------------------------>
@@ -163,12 +163,20 @@ ol{
 
 //Global Constants
 const mediaConstraints = {'video': true, 'audio': false};
-const peerConnection = new RTCPeerConnection();    
+const peerConnection = new RTCPeerConnection();
+peerConnection.ontrack = handleTrackEvent;
+
 peerConnection.addEventListener('connectionstatechange', event => {
     if (peerConnection.connectionState === 'connected') {
         alert("Connection established");
     }
 });
+
+function handleTrackEvent(event) {
+	alert("Track triggered")
+	document.getElementById("remoteVideo").srcObject = event.streams[0];
+}
+
 peerConnection.onicecandidate = e =>  {
  	document.getElementById("mySDP_area").value = (JSON.stringify(peerConnection.localDescription));
 }
@@ -177,11 +185,15 @@ sendChannel.onmessage =e =>  console.log("messsage received!!!"  + e.data )
 sendChannel.onopen = e => alert("Data channel opened");
 sendChannel.onclose =e => alert("Data channel closed");
 
-async function getLocalVideo() {
+async function addLocalStream() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        const videoElement = document.querySelector('video#localVideo');
-        videoElement.srcObject = stream;
+        const localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+		localStream.getTracks().forEach(track => {
+		    peerConnection.addTrack(track, localStream);
+		    console.log(track);
+		});
+		const videoElement = document.getElementById('localVideo');
+        videoElement.srcObject = localStream;
     } catch(error) {
         alert(error.message);
     }
@@ -208,14 +220,10 @@ async function setAnswer(){
 	}
 }
 
-function main() {
-	getLocalVideo();
+function main(){
+	addLocalStream();
 }
-
 main();
-
-
-
 </script>
 
 </body>
